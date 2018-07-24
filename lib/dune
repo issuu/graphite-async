@@ -1,0 +1,5 @@
+(library
+  (name graphite_async)
+  (public_name graphite-async)
+  (libraries core_kernel amqp-client-async async)
+  (preprocess (pps ppx_let)))

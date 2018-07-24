@@ -1,0 +1,9 @@
+(executable
+ (name test)
+ (preprocess (pps ppx_let))
+ (libraries alcotest graphite_async))
+
+(alias
+ (name runtest)
+ (deps (:test test.exe))
+ (action (run %{test})))
