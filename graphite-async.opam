@@ -10,6 +10,7 @@ depends: [
   "dune" {build}
   "async_kernel" {>= "v0.9" & < "v0.12"}
   "core_kernel" {>= "v0.9" & < "v0.12"}
+  "amqp-client-async" {>= "2.0.0" & < "3.0.0"}
   "ppx_let" {>= "v0.9" & < "v0.12"}
   "alcotest" {test}
   "fmt" {test}
