@@ -1,6 +1,8 @@
 Graphite
 ========
 
+[![Build Status](https://travis-ci.org/issuu/graphite-async.svg?branch=master)](https://travis-ci.org/issuu/graphite-async)
+
 Report performance stats (with percentiles) to Graphite over AMQP.
 
 Dependencies
