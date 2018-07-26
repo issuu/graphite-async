@@ -1,3 +1,6 @@
+0.10.0
+======
+
 * Add interface to make irrelevant contents private
 
 0.9.0
