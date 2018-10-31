@@ -19,19 +19,14 @@ val init :
   ?percentile_period:int ->
   ?percentiles:float list ->
   prefix:string -> Amqp.Connection.t -> t Deferred.t
-val incr : ?by:int -> key:string Hashtbl.key -> t -> unit
-val decr : t -> key:string Hashtbl.key -> int -> unit
-val incr_opt :
-  ?by:int ->
-  key:string Hashtbl.key -> t Option.t -> unit
-val decr_opt :
-  t Option.t -> key:string Hashtbl.key -> int -> unit
-val set : t -> key:string Hashtbl.key -> int -> unit
-val remove : t -> key:string Hashtbl.key -> unit
-val add_percentile_observation :
-  t -> key:string Hashtbl.key -> Percentile.value -> unit
-val add_percentile_observation_opt :
-  t option -> key:string Hashtbl.key -> Percentile.value -> unit
+val incr : ?by:int -> key:string -> t -> unit
+val decr : t -> key:string -> int -> unit
+val incr_opt : ?by:int -> key:string -> t Option.t -> unit
+val decr_opt : t Option.t -> key:string -> int -> unit
+val set : t -> key:string -> int -> unit
+val remove : t -> key:string -> unit
+val add_percentile_observation : t -> key:string -> Percentile.value -> unit
+val add_percentile_observation_opt : t option -> key:string -> Percentile.value -> unit
 
 module Result : sig
   val time :
