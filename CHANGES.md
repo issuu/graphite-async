@@ -1,3 +1,5 @@
+* Add get_report function
+
 0.10.0
 ======
 

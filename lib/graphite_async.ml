@@ -83,7 +83,8 @@ type t = {
   metrics: (string, int) Hashtbl.t;
   percentile_period: int; (* At some point we should allow multiple periods *)
   percentiles: float list;
-  percentile_data: (string, Percentile.t) Hashtbl.t
+  percentile_data: (string, Percentile.t) Hashtbl.t;
+  init_time: Time.t;
 }
 
 type stat = {
@@ -111,6 +112,30 @@ let send t () =
           { path=key; value=data; ts=now } :: acc))
   |> send_raw t
 
+let get_report t =
+  let time_since_init = Time.diff (Time.now ()) t.init_time in
+  let format_row key metric =
+    Printf.sprintf "key: %s; total_observations: %d; rate: %f"
+      key
+      metric
+      ((Float.of_int metric) /. Time.Span.to_sec time_since_init)
+  in
+  let percentile_data =
+    t.percentile_data
+    |> Hashtbl.to_alist
+    |> List.map ~f:(fun (key, fractile) -> format_row key fractile.Percentile.sum)
+    |> String.concat ~sep:"\n"
+    |> Printf.sprintf "percentile data: {%s}"
+  in
+  let metric_data =
+    t.metrics
+    |> Hashtbl.to_alist
+    |> List.map ~f:(Tuple2.uncurry format_row)
+    |> String.concat ~sep:"\n"
+    |> Printf.sprintf "metric data: {%s}"
+  in
+  Printf.sprintf "%s\n%s" percentile_data metric_data
+
 let init ?(updates_per_minute=2) ?(percentile_period=60) ?(percentiles=[50.; 90.; 95.; 99.]) ~prefix connection =
   let%bind channel = Amqp.Connection.open_channel ~id:"graphite" Amqp.Channel.no_confirm connection in
   let%bind exchange = Amqp.Exchange.declare ~durable:true channel Amqp.Exchange.topic_t "metrics" in
@@ -121,7 +146,8 @@ let init ?(updates_per_minute=2) ?(percentile_period=60) ?(percentiles=[50.; 90.
     metrics = Hashtbl.Poly.create ();
     percentile_period;
     percentiles;
-    percentile_data = Hashtbl.Poly.create ()
+    percentile_data = Hashtbl.Poly.create ();
+    init_time = Time.now ();
   }
   in
 
