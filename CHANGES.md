@@ -1,3 +1,5 @@
+* Add Graphite.Report module to generate reports for easy printing
+
 0.10.0
 ======
 

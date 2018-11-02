@@ -1,18 +1,26 @@
-opam-version: "1.2"
+opam-version: "2.0"
 maintainer: "Marek Kubica <mku@issuu.com>"
 author: "Team Raccoon"
+synopsis: "Submits statistics to Graphite"
+description: """
+Submits statistics to Graphite
+
+Similar to statsd this library computes percentiles for requests. Stats are
+submitted via AMQP. Supports common OCaml and Jane Street data types
+"""
 homepage: "https://github.com/issuu/graphite-async"
-dev-repo: "git@github.com:issuu/graphite-async.git"
+dev-repo: "git+https://github.com:issuu/graphite-async.git"
 bug-reports: "https://github.com/issuu/graphite-async/issues"
 doc: "https://issuu.github.io/graphite-async/"
 build: [["dune" "build" "-p" name "-j" jobs]]
-build-test: [["dune" "runtest" "-p" name "-j" jobs]]
+run-test: [["dune" "runtest" "-p" name "-j" jobs]]
 depends: [
   "dune" {build}
   "async_kernel" {>= "v0.9" & < "v0.12"}
   "core_kernel" {>= "v0.9" & < "v0.12"}
   "amqp-client-async" {>= "2.0.0" & < "3.0.0"}
   "ppx_let" {>= "v0.9" & < "v0.12"}
-  "alcotest" {test}
-  "fmt" {test}
+  "ppx_deriving" {>= "4.2" & < "4.3"}
+  "alcotest" {with-test}
+  "fmt" {with-test}
 ]

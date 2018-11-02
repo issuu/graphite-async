@@ -1,4 +1,0 @@
-Submits statistics to Graphite
-
-Similar to statsd this library computes percentiles for requests. Stats are
-submitted via AMQP. Supports common OCaml and Jane Street data types.
