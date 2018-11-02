@@ -112,29 +112,34 @@ let send t () =
           { path=key; value=data; ts=now } :: acc))
   |> send_raw t
 
-let get_report t =
+module Report = struct
+  type metric = {
+    observations: int;
+    rate: float;
+  } [@@deriving show]
+
+  type t = (string * metric) list [@@deriving show]
+end
+
+let generate_report t =
   let time_since_init = Time.diff (Time.now ()) t.init_time in
-  let format_row key metric =
-    Printf.sprintf "key: %s; total_observations: %d; rate: %f"
-      key
-      metric
-      ((Float.of_int metric) /. Time.Span.to_sec time_since_init)
+  let to_metric observations =
+    Report.{
+      observations;
+      rate = ((Float.of_int observations) /. Time.Span.to_sec time_since_init);
+    }
   in
   let percentile_data =
     t.percentile_data
     |> Hashtbl.to_alist
-    |> List.map ~f:(fun (key, fractile) -> format_row key fractile.Percentile.sum)
-    |> String.concat ~sep:"\n"
-    |> Printf.sprintf "percentile data: {%s}"
+    |> List.map ~f:(fun (key, fractile) -> (key, to_metric fractile.Percentile.sum))
   in
   let metric_data =
     t.metrics
     |> Hashtbl.to_alist
-    |> List.map ~f:(Tuple2.uncurry format_row)
-    |> String.concat ~sep:"\n"
-    |> Printf.sprintf "metric data: {%s}"
+    |> List.map ~f:(fun (key, metric) -> (key, to_metric metric))
   in
-  Printf.sprintf "%s\n%s" percentile_data metric_data
+  percentile_data @ metric_data
 
 let init ?(updates_per_minute=2) ?(percentile_period=60) ?(percentiles=[50.; 90.; 95.; 99.]) ~prefix connection =
   let%bind channel = Amqp.Connection.open_channel ~id:"graphite" Amqp.Channel.no_confirm connection in

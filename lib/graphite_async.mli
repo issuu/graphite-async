@@ -14,6 +14,11 @@ end
 
 type t
 
+module Report : sig
+  type metric [@@deriving show]
+  type t = (string, metric) List.Assoc.t [@@deriving show]
+end
+
 val init :
   ?updates_per_minute:int ->
   ?percentile_period:int ->
@@ -27,7 +32,7 @@ val set : t -> key:string -> int -> unit
 val remove : t -> key:string -> unit
 val add_percentile_observation : t -> key:string -> Percentile.value -> unit
 val add_percentile_observation_opt : t option -> key:string -> Percentile.value -> unit
-val get_report : t -> string
+val generate_report : t -> Report.t
 
 module Result : sig
   val time :

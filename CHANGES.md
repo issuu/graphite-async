@@ -1,4 +1,4 @@
-* Add get_report function
+* Add Graphite.Report module to generate reports for easy printing
 
 0.10.0
 ======
