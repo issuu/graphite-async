@@ -9,7 +9,7 @@ Similar to statsd this library computes percentiles for requests. Stats are
 submitted via AMQP. Supports common OCaml and Jane Street data types
 """
 homepage: "https://github.com/issuu/graphite-async"
-dev-repo: "git+https://github.com:issuu/graphite-async.git"
+dev-repo: "git://git@github.com:issuu/graphite-async.git"
 bug-reports: "https://github.com/issuu/graphite-async/issues"
 doc: "https://issuu.github.io/graphite-async/"
 build: [["dune" "build" "-p" name "-j" jobs]]
