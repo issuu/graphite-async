@@ -121,7 +121,7 @@ module Report = struct
   type t = (string * metric) list [@@deriving show]
 end
 
-let generate_report t =
+let report t =
   let time_since_init = Time.diff (Time.now ()) t.init_time in
   let to_metric observations =
     Report.{

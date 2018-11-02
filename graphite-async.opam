@@ -1,4 +1,4 @@
-opam-version: "1.2"
+opam-version: "2.0"
 maintainer: "Marek Kubica <mku@issuu.com>"
 author: "Team Raccoon"
 homepage: "https://github.com/issuu/graphite-async"
@@ -14,7 +14,6 @@ depends: [
   "amqp-client-async" {>= "2.0.0" & < "3.0.0"}
   "ppx_let" {>= "v0.9" & < "v0.12"}
   "ppx_deriving" {>= "4.2" & < "4.3"}
-  "ppx_driver" {build}
   "alcotest" {test}
   "fmt" {test}
 ]
