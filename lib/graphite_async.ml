@@ -116,6 +116,7 @@ module Report = struct
   type metric = {
     observations: int;
     rate: float;
+    avg: float option;
   } [@@deriving show]
 
   type t = (string * metric) list [@@deriving show]
@@ -123,21 +124,25 @@ end
 
 let report t =
   let time_since_init = Time.diff (Time.now ()) t.init_time in
-  let to_metric observations =
-    Report.{
-      observations;
-      rate = ((Float.of_int observations) /. Time.Span.to_sec time_since_init);
-    }
-  in
   let percentile_data =
     t.percentile_data
     |> Hashtbl.to_alist
-    |> List.map ~f:(fun (key, fractile) -> (key, to_metric fractile.Percentile.sum))
+    |> List.map ~f:(fun (key, fractile) -> (key,
+    Report.{
+      observations = fractile.Percentile.total_observations;
+      rate = Float.(of_int fractile.Percentile.total_observations / Time.Span.to_sec time_since_init);
+      avg = Some Float.(of_int fractile.Percentile.sum / of_int fractile.Percentile.total_observations)
+    }
+  ))
   in
   let metric_data =
     t.metrics
     |> Hashtbl.to_alist
-    |> List.map ~f:(fun (key, metric) -> (key, to_metric metric))
+    |> List.map ~f:(fun (key, metric) -> (key, Report.{
+      observations = metric;
+      rate = ((Float.of_int metric) /. Time.Span.to_sec time_since_init);
+      avg = None;
+    }))
   in
   percentile_data @ metric_data
 

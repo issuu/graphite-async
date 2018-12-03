@@ -1,3 +1,6 @@
+* Fix percentile reports reporting sums as observations.
+* Add `avg` to percentiles in reports.
+
 0.11.0
 ======
 
