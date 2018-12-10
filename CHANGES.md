@@ -1,3 +1,10 @@
+0.13.0
+======
+
+* Add `sum` to report
+* Add `obs_rate` to report. Shows the rate of observations.
+* `rate` now shows the rate of change in percentile sums.
+
 0.12.0
 ======
 
