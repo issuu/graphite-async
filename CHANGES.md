@@ -1,3 +1,5 @@
+* Drop upper version constraints on Jane Street packages
+
 0.13.0
 ======
 
