@@ -223,4 +223,10 @@ module Deferred = struct
     let%bind r = f v in
     add_percentile_observation_opt graphite ~key:(Printf.sprintf "%s.ok" key) (timer ());
     return r
+
+  let keyed_time ?graphite ~key ~f v =
+    let timer = timer_ms () in
+    let%bind chunk, r = f v in
+    add_percentile_observation_opt graphite ~key:(Printf.sprintf "%s.%s" key chunk) (timer ());
+    return r
 end

@@ -56,4 +56,10 @@ module Deferred : sig
     key:string ->
     f:('a -> 'b Deferred.t) ->
     'a -> 'b Deferred.t
+
+  val keyed_time :
+    ?graphite:t ->
+    key:string ->
+    f:('a -> (string * 'b) Deferred.t) ->
+    'a -> 'b Deferred.t
 end
