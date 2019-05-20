@@ -1,3 +1,6 @@
+* Add `Deferred.keyed_time` to allow deferred to decide on part of the key
+  string. Useful for logging per status code or similar.
+
 0.13.1
 ======
 

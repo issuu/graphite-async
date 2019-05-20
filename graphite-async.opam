@@ -15,7 +15,7 @@ doc: "https://issuu.github.io/graphite-async/"
 build: [["dune" "build" "-p" name "-j" jobs]]
 run-test: [["dune" "runtest" "-p" name "-j" jobs]]
 depends: [
-  "dune" {build}
+  "dune" {build & >= "1.9"}
   "async_kernel" {>= "v0.9"}
   "core_kernel" {>= "v0.9"}
   "amqp-client-async" {>= "2.0.0" & < "3.0.0"}
