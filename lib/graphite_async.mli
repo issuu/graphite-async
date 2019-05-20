@@ -51,6 +51,7 @@ val add_percentile_observation : t -> key:string -> Percentile.value -> unit
 val add_percentile_observation_opt : t option -> key:string -> Percentile.value -> unit
 
 val report : t -> Report.t
+val flush : t -> unit Deferred.t
 
 module Result : sig
   val time
