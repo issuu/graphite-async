@@ -1,3 +1,6 @@
+0.14.0
+======
+
 * Expose `flush` endpoint to flush queued message to graphite
 
 0.13.2
