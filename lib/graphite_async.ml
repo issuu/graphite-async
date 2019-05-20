@@ -119,8 +119,7 @@ let send t () =
            {path = key; value = data; ts = now} :: acc ) )
   |> send_raw t
 
-let flush t =
-  send t ()
+let flush t = send t ()
 
 module Report = struct
   type metric = {
