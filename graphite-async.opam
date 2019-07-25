@@ -18,9 +18,9 @@ depends: [
   "dune" {build & >= "1.9"}
   "async_kernel" {>= "v0.9"}
   "core_kernel" {>= "v0.9"}
-  "amqp-client-async" {>= "2.0.0" & < "3.0.0"}
+  "amqp-client-async" {>= "2.0.0"}
   "ppx_let" {>= "v0.9"}
-  "ppx_deriving" {>= "4.2" & < "4.3"}
+  "ppx_deriving" {>= "4.2"}
   "alcotest" {with-test}
   "fmt" {with-test}
 ]

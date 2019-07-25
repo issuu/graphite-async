@@ -1,3 +1,6 @@
+* Do not lock dependencies to versions in advance. In particular the
+  `ppx_deriving` lockdown prevents use of OCaml 4.08.
+
 0.14.0
 ======
 
