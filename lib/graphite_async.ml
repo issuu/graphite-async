@@ -223,10 +223,7 @@ module Result = struct
     let timer = timer_ms () in
     let%bind r = f v in
     let time_span = timer () in
-    let () = match callback with
-      | Some callback -> callback time_span v r
-      | None -> ()
-    in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
     let sub_key =
       match r with
       | Ok _ -> "ok"
@@ -244,10 +241,7 @@ module Option = struct
     let timer = timer_ms () in
     let%bind r = f v in
     let time_span = timer () in
-    let () = match callback with
-      | Some callback -> callback time_span v r
-      | None -> ()
-    in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
     let sub_key =
       match r with
       | Some _ -> "ok"
@@ -265,10 +259,7 @@ module Deferred = struct
     let timer = timer_ms () in
     let%bind r = f v in
     let time_span = timer () in
-    let () = match callback with
-      | Some callback -> callback time_span v r
-      | None -> ()
-    in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
     add_percentile_observation_opt
       graphite
       ~key:(Printf.sprintf "%s.ok" key)
@@ -279,10 +270,7 @@ module Deferred = struct
     let timer = timer_ms () in
     let%bind chunk, r = f v in
     let time_span = timer () in
-    let () = match callback with
-      | Some callback -> callback time_span v (chunk, r)
-      | None -> ()
-    in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v (chunk, r));
     add_percentile_observation_opt
       graphite
       ~key:(Printf.sprintf "%s.%s" key chunk)
