@@ -1,3 +1,5 @@
+* Add support for callback functionality on timing functions.
+
 0.14.1
 ======
 

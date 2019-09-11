@@ -8,7 +8,7 @@ let timer_ms () =
   let start_ts = Time.now () in
   fun () ->
     let end_ts = Time.now () in
-    Time.diff end_ts start_ts |> Time.Span.to_ms |> int_of_float
+    Time.diff end_ts start_ts
 
 module Percentile = struct
   type ts = int
@@ -219,9 +219,11 @@ let add_percentile_observation_opt t ~key value =
   | Some t -> add_percentile_observation t ~key value
 
 module Result = struct
-  let time ?graphite ~key ~f v =
+  let time ?graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind r = f v in
+    let time_span = timer () in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
     let sub_key =
       match r with
       | Ok _ -> "ok"
@@ -230,14 +232,16 @@ module Result = struct
     add_percentile_observation_opt
       graphite
       ~key:(Printf.sprintf "%s.%s" key sub_key)
-      (timer ());
+      (time_span |> Time.Span.to_ms |> int_of_float);
     return r
 end
 
 module Option = struct
-  let time ?graphite ~key ~f v =
+  let time ?graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind r = f v in
+    let time_span = timer () in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
     let sub_key =
       match r with
       | Some _ -> "ok"
@@ -246,23 +250,30 @@ module Option = struct
     add_percentile_observation_opt
       graphite
       ~key:(Printf.sprintf "%s.%s" key sub_key)
-      (timer ());
+      (time_span |> Time.Span.to_ms |> int_of_float);
     return r
 end
 
 module Deferred = struct
-  let time ?graphite ~key ~f v =
+  let time ?graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind r = f v in
-    add_percentile_observation_opt graphite ~key:(Printf.sprintf "%s.ok" key) (timer ());
+    let time_span = timer () in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
+    add_percentile_observation_opt
+      graphite
+      ~key:(Printf.sprintf "%s.ok" key)
+      (time_span |> Time.Span.to_ms |> int_of_float);
     return r
 
-  let keyed_time ?graphite ~key ~f v =
+  let keyed_time ?graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind chunk, r = f v in
+    let time_span = timer () in
+    Core.Option.iter callback ~f:(fun callback -> callback time_span v (chunk, r));
     add_percentile_observation_opt
       graphite
       ~key:(Printf.sprintf "%s.%s" key chunk)
-      (timer ());
+      (time_span |> Time.Span.to_ms |> int_of_float);
     return r
 end
