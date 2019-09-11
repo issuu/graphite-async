@@ -55,8 +55,8 @@ val report : t -> Report.t
 val flush : t -> unit Deferred.t
 
 module Result : sig
-  val time :
-    ?graphite:t ->
+  val time
+    :  ?graphite:t ->
     ?callback:(Time.Span.t -> 'a -> ('b, 'c) Result.t -> unit) ->
     key:string ->
     f:('a -> ('b, 'c) Deferred.Result.t) ->
@@ -65,8 +65,8 @@ module Result : sig
 end
 
 module Option : sig
-  val time :
-    ?graphite:t ->
+  val time
+    :  ?graphite:t ->
     ?callback:(Time.Span.t -> 'a -> 'b option -> unit) ->
     key:string ->
     f:('a -> 'b option Deferred.t) ->
@@ -75,16 +75,16 @@ module Option : sig
 end
 
 module Deferred : sig
-  val time :
-    ?graphite:t ->
+  val time
+    :  ?graphite:t ->
     ?callback:(Time.Span.t -> 'a -> 'b -> unit) ->
     key:string ->
     f:('a -> 'b Deferred.t) ->
     'a ->
     'b Deferred.t
 
-  val keyed_time :
-    ?graphite:t ->
+  val keyed_time
+    :  ?graphite:t ->
     ?callback:(Time.Span.t -> 'a -> string * 'b -> unit) ->
     key:string ->
     f:('a -> (string * 'b) Deferred.t) ->
