@@ -26,6 +26,12 @@ module Report : sig
   type t = (string, metric) List.Assoc.t [@@deriving show]
 end
 
+val init_mock
+  : ?percentile_period:int ->
+    ?percentiles:float list ->
+    unit ->
+    t
+
 val init
   :  ?updates_per_minute:int ->
   ?percentile_period:int ->
