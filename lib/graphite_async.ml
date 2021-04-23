@@ -76,10 +76,16 @@ module Percentile = struct
     t.sum <- t.sum + value
 end
 
+type connection =
+  | Mock
+  | Real of {
+    channel : Amqp.Channel.no_confirm Amqp.Channel.t;
+    exchange : [`Topic of string] Amqp.Exchange.t;
+    prefix : string; }
+
 type t = {
-  channel : Amqp.Channel.no_confirm Amqp.Channel.t;
-  exchange : [`Topic of string] Amqp.Exchange.t;
-  prefix : string;
+  connection : connection;
+
   metrics : (string, int) Hashtbl.t;
   percentile_period : int;
   (* At some point we should allow multiple periods *)
@@ -95,18 +101,21 @@ type stat = {
 }
 
 let send_raw t stats =
-  let msg =
-    stats
-    |> List.map ~f:(fun stat ->
-           Printf.sprintf "%s.%s %d %d" t.prefix stat.path stat.value stat.ts )
-    |> String.concat ~sep:"\n"
-  in
-  Amqp.Exchange.publish
-    t.channel
-    t.exchange
-    ~routing_key:"graphite"
-    (Amqp.Message.make msg)
-  >>= fun `Ok -> return ()
+  match t with
+  | { connection=Mock; _ } -> return ()
+  | { connection=Real t; _ } ->
+    let msg =
+      stats
+      |> List.map ~f:(fun stat ->
+            Printf.sprintf "%s.%s %d %d" t.prefix stat.path stat.value stat.ts )
+      |> String.concat ~sep:"\n"
+    in
+    Amqp.Exchange.publish
+      t.channel
+      t.exchange
+      ~routing_key:"graphite"
+      (Amqp.Message.make msg)
+    >>= fun `Ok -> return ()
 
 let send t () =
   let now = now () in
@@ -172,6 +181,14 @@ let report t =
   in
   percentile_data @ metric_data
 
+let init_mock ?(percentile_period = 60) ?(percentiles = [50.; 90.; 95.; 99.]) () =
+  { connection=Mock;
+    metrics = Hashtbl.Poly.create ();
+    percentile_period;
+    percentiles;
+    percentile_data = Hashtbl.Poly.create ();
+    init_time = Time.now () }
+
 let init ?(updates_per_minute = 2) ?(percentile_period = 60)
     ?(percentiles = [50.; 90.; 95.; 99.]) ~prefix connection
   =
@@ -181,10 +198,14 @@ let init ?(updates_per_minute = 2) ?(percentile_period = 60)
   let%bind exchange =
     Amqp.Exchange.declare ~durable:true channel Amqp.Exchange.topic_t "metrics"
   in
+  let connection = Real {
+    channel;
+    exchange;
+    prefix;
+  }
+in
   let t =
-    { channel;
-      exchange;
-      prefix;
+    { connection;
       metrics = Hashtbl.Poly.create ();
       percentile_period;
       percentiles;
