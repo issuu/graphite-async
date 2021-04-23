@@ -1,3 +1,8 @@
+0.14.3
+======
+
+* Add support for Mock graphite that does not report to remote
+
 0.14.2
 ======
 
