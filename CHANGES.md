@@ -1,3 +1,5 @@
+* Remove optional Graphite.t parameters
+
 0.14.3
 ======
 
