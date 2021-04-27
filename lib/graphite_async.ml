@@ -221,10 +221,6 @@ let incr ?by ~key t = Hashtbl.incr ?by t.metrics key
 
 let decr t ~key value = Hashtbl.decr ~by:value t.metrics key
 
-let incr_opt ?by ~key t = Option.iter t ~f:(fun t -> incr t ~key ?by)
-
-let decr_opt t ~key value = Option.iter t ~f:(fun t -> decr t ~key value)
-
 let set t ~key value = Hashtbl.set t.metrics ~key ~data:value
 
 let remove t ~key = Hashtbl.remove t.metrics key
@@ -234,13 +230,8 @@ let add_percentile_observation t ~key value =
       Percentile.init ~period:t.percentile_period ~percentiles:t.percentiles )
   |> fun f -> Percentile.add_observation f ~now:(now ()) value
 
-let add_percentile_observation_opt t ~key value =
-  match t with
-  | None -> ()
-  | Some t -> add_percentile_observation t ~key value
-
 module Result = struct
-  let time ?graphite ?callback ~key ~f v =
+  let time ~graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind r = f v in
     let time_span = timer () in
@@ -250,7 +241,7 @@ module Result = struct
       | Ok _ -> "ok"
       | Error _ -> "error"
     in
-    add_percentile_observation_opt
+    add_percentile_observation
       graphite
       ~key:(Printf.sprintf "%s.%s" key sub_key)
       (time_span |> Time.Span.to_ms |> int_of_float);
@@ -258,7 +249,7 @@ module Result = struct
 end
 
 module Option = struct
-  let time ?graphite ?callback ~key ~f v =
+  let time ~graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind r = f v in
     let time_span = timer () in
@@ -268,7 +259,7 @@ module Option = struct
       | Some _ -> "ok"
       | None -> "error"
     in
-    add_percentile_observation_opt
+    add_percentile_observation
       graphite
       ~key:(Printf.sprintf "%s.%s" key sub_key)
       (time_span |> Time.Span.to_ms |> int_of_float);
@@ -276,23 +267,23 @@ module Option = struct
 end
 
 module Deferred = struct
-  let time ?graphite ?callback ~key ~f v =
+  let time ~graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind r = f v in
     let time_span = timer () in
     Core.Option.iter callback ~f:(fun callback -> callback time_span v r);
-    add_percentile_observation_opt
+    add_percentile_observation
       graphite
       ~key:(Printf.sprintf "%s.ok" key)
       (time_span |> Time.Span.to_ms |> int_of_float);
     return r
 
-  let keyed_time ?graphite ?callback ~key ~f v =
+  let keyed_time ~graphite ?callback ~key ~f v =
     let timer = timer_ms () in
     let%bind chunk, r = f v in
     let time_span = timer () in
     Core.Option.iter callback ~f:(fun callback -> callback time_span v (chunk, r));
-    add_percentile_observation_opt
+    add_percentile_observation
       graphite
       ~key:(Printf.sprintf "%s.%s" key chunk)
       (time_span |> Time.Span.to_ms |> int_of_float);
