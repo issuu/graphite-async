@@ -1,3 +1,6 @@
+1.0.0
+=====
+
 * Remove optional Graphite.t parameters
 
 0.14.3
